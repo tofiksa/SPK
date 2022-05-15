@@ -2967,6 +2967,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
 
   // code/assets.js
   function loadAssets() {
+    asciistring = " \u263A\u263B\u2665\u2666\u2663\u2660\u2022\u25D8\u25CB\u25D9\u2642\u2640\u266A\u266B\u263C\u25BA\u25C4\u2195\u203C\xB6\xA7\u25AC\u21A8\u2191\u2193\u2192\u2190\u221F\u2194\u25B2\u25BC !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u2302\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xEF\xEE\xEC\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xF2\xFB\xF9\xFF\xD6\xDC\xA2\xA3\xA5\u20A7\u0192\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\u2310\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\xF8\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0";
     loadSprite("tos", "sprites/teamdrue.png");
     loadSprite("bg", "sprites/bg.png");
     loadSprite("ghosty", "sprites/ghosty.png");
@@ -2984,6 +2985,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loadSound("blip", "sounds/blip.mp3");
     loadSound("hit", "sounds/hit.mp3");
     loadSound("portal", "sounds/portal.mp3");
+    loadFont("mccloud", "fonts/drake_10x10.png", 10, 10, { chars: asciistring });
   }
   __name(loadAssets, "loadAssets");
 
@@ -3119,21 +3121,62 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     add([sprite("innblikklogo", pos(width() / 4, height() / 4), origin("center"), scale(1), fixed())]);
     const mark = add([
       sprite("portal"),
-      pos(width() / 2, height() / 2),
+      pos(width() / 1.2, height() / 3.5),
       scale(10),
       rotate(0),
       origin("center")
     ]);
-    loadFont("mccloud", "fonts/023_16.png", 8, 8);
     add([
-      text("Hjelp kundebetjening med \xE5 n\xE5 m\xE5lene for 2.tertial. \nVed aa l\xF8se s\xE5 mange jira tickets som mulig. \n\nTrykk p\xE5 space for \xE5 starte spillet", { size: 32, font: "sink" }),
+      text("Hjelp team kundebetjenings maskott <druen> med \xE5 n\xE5 m\xE5lene for 2.tertial. \nVed \xE5 l\xF8se s\xE5 mange jira tickets som mulig. \n\nTrykk p\xE5 space for \xE5 starte spillet", { size: 24, font: "mccloud" }),
       pos(50, 300)
     ]);
     mark.action(() => {
       mark.scale = Math.sin(time()) * 1;
       mark.angle += dt();
     });
-    onKeyPress(() => go("game"));
+    onKeyPress(() => go("interlude"));
+  });
+  scene("interlude", ({ levelId, coins } = { levelId: 0, coins: 0 }) => {
+    let levelMessage = "";
+    switch (levelId) {
+      case 1:
+        levelMessage = "\n\n - Ada kundelogg";
+        break;
+      case 2:
+        levelMessage = "\n\n - Innsiktsfase - Sikker dialog";
+        break;
+      case 3:
+        levelMessage = "\n\n - Styringsverkt\xF8y for \xE5 prioritere smertepunkter";
+        break;
+      case 4:
+        levelMessage = "\n\n - Etablere baseline for videre maalinger av smertepunkter";
+        break;
+      default:
+        levelMessage = "\n\n - Opplyste pensjonsvalg fase III";
+    }
+    add([
+      pos(50, 300),
+      fixed(),
+      text("Level " + (levelId + 1) + levelMessage, {
+        size: 24,
+        width: width() / 1,
+        font: "mccloud",
+        transform: (idx, ch) => ({
+          color: hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
+          pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
+          scale: wave(1, 1.2, time() * 3 + idx),
+          angle: wave(-9, 9, time() * 3 + idx)
+        })
+      })
+    ]);
+    wait(3, () => go("game", {
+      levelId,
+      coins
+    }));
+    onKeyPress(() => go("game", {
+      levelId,
+      coins
+    }));
   });
   scene("game", ({ levelId, coins } = { levelId: 0, coins: 0 }) => {
     let bg = add([sprite("bg", pos(width() / 2, height() / 2), origin("center"), scale(1), fixed())]);
@@ -3161,12 +3204,15 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     player.onCollide("portal", () => {
       play("portal");
       if (levelId + 1 < LEVELS.length) {
-        go("game", {
+        go("interlude", {
           levelId: levelId + 1,
           coins
         });
       } else {
-        go("win");
+        go("win", {
+          levelId: levelId + 1,
+          coins
+        });
       }
     });
     player.onGround((l) => {
@@ -3179,7 +3225,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     });
     player.onCollide("enemy", (e, col) => {
       if (!col.isBottom()) {
-        go("lose");
+        go("lose", {
+          levelId: levelId + 1,
+          coins
+        });
         play("hit");
       }
     });
@@ -3238,88 +3287,40 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     onKeyPress("f", () => {
       fullscreen(!fullscreen());
     });
-    if (levelId == 0) {
-      add([
-        pos(24, 124),
-        fixed(),
-        text("Indikator 1: - Opplyste pensjonsvalg fase III", {
-          size: 30,
-          width: 520,
-          font: "apl386o"
-        })
-      ]);
-      add([
-        pos(24, 324),
-        fixed(),
-        text("Bruk piltastene for aa komme deg til teamet\n\n Space knappen for aa hoppe.", {
-          size: 30,
-          width: 520,
-          font: "apl386o"
-        })
-      ]);
-    } else if (levelId == 1) {
-      add([
-        pos(24, 124),
-        fixed(),
-        text("Indikator 2: - Ada kundelogg", {
-          size: 30,
-          width: 520,
-          font: "apl386o"
-        })
-      ]);
-    } else if (levelId == 2) {
-      add([
-        pos(24, 124),
-        fixed(),
-        text("Indikator 3: - Innsiktsfase - Sikker dialog", {
-          size: 30,
-          width: 520,
-          font: "apl386o"
-        })
-      ]);
-    } else if (levelId == 3) {
-      add([
-        pos(24, 124),
-        fixed(),
-        text("Indikator 4: - Styringsverktoey for aa prioritere smertepunkter", {
-          size: 30,
-          width: 520,
-          font: "apl386o"
-        })
-      ]);
-    } else if (levelId == 4) {
-      add([
-        pos(24, 124),
-        fixed(),
-        text("Indikator 5: - Etablere baseline for videre maalinger av smertepunkter", {
-          size: 30,
-          width: 520,
-          font: "apl386o"
-        })
-      ]);
-    }
   });
-  scene("lose", () => {
+  scene("lose", ({ levelId, coins } = { levelId: 0, coins: 0 }) => {
+    let message = "Takk for hjelpen s\xE5 langt. \nDu hjalp kundebetjening med \xE5 l\xF8se: " + coins + " jiraer\n Du er velkommen til \xE5 pr\xF8ve igjen\n ved \xE5 trykke p\xE5 en tast.";
     add([
       pos(160, 120),
-      text("Nei, klarte ikke maalene :(")
+      fixed(),
+      text(message, {
+        size: 24,
+        width: width() / 1,
+        font: "mccloud",
+        transform: (idx, ch) => ({
+          color: hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
+          pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
+          scale: wave(1, 1.2, time() * 3 + idx),
+          angle: wave(-9, 9, time() * 3 + idx)
+        })
+      })
     ]);
     add([
       sprite("gameover"),
-      pos(160, 220)
+      pos(160, 250)
     ]);
-    onKeyPress(() => go("game"));
+    onKeyPress(() => go("interlude"));
   });
-  scene("win", () => {
-    const url = "Hurra, du fikk team kundebetjening gjennom indikatorene for 2.tertial sine";
+  scene("win", ({ levelId, coins } = { levelId: 0, coins: 0 }) => {
+    const url = "Hurra, du hjalp team kundebetjening\n\xE5 n\xE5 m\xE5let for 2.tertial.\n\nDu greide \xE5 l\xF8se " + coins + " jiraer";
     add([
-      text(url)
+      text(url, { font: "mccloud", size: 32 })
     ]);
     add([
       sprite("winner"),
       pos(160, 220)
     ]);
-    onKeyPress(() => go("game"));
+    onKeyPress(() => go("splash"));
   });
   go("splash");
 })();

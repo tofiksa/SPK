@@ -147,6 +147,7 @@ app.delete("/db/:item", async (req, res) => {
 });
 
 app.use("/sprites", express.static("sprites"));
+app.use("/fonts", express.static("fonts"));
 app.use("/sounds", express.static("sounds"));
 app.use("/code", express.static("code"));
 app.use("/dist", express.static("dist"));

@@ -1,4 +1,7 @@
 export default function loadAssets() {
+
+  asciistring = " ☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞øε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■";
+  
 	loadSprite("tos", "sprites/teamdrue.png");
   loadSprite("bg", "sprites/bg.png");
 	loadSprite("ghosty", "sprites/ghosty.png");
@@ -16,6 +19,6 @@ export default function loadAssets() {
 	loadSound("blip", "sounds/blip.mp3");
 	loadSound("hit", "sounds/hit.mp3");
 	loadSound("portal", "sounds/portal.mp3");
-  
+  loadFont("mccloud", "fonts/drake_10x10.png",10,10,    {chars:asciistring})
  
 }
